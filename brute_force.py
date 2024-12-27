@@ -8,14 +8,16 @@ def read_data(csv_file):
     with open(csv_file, mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            profit = float(
-                row["Bénéfice (après 2 ans)"].replace('%', '')) / 100
-            action = {
-                "name": row["Actions"],
-                "cost": float(row["Coût par action (en euros)"]),
-                "profit": profit
-            }
-            actions.append(action)
+            cost = float(row["Coût par action (en euros)"])
+            if cost > 0:  # Exclure les coûts nuls ou négatifs
+                profit = float(
+                    row["Bénéfice (après 2 ans)"].replace('%', '')) / 100
+                action = {
+                    "name": row["Actions"],
+                    "cost": cost,
+                    "profit": profit
+                }
+                actions.append(action)
     return actions
 
 
