@@ -7,12 +7,12 @@ def read_data(csv_file):
     with open(csv_file, mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            cost = float(row["Coût par action (en euros)"])
+            cost = float(row["price"])
             if cost > 0:  # Exclure les coûts nuls ou négatifs
                 profit = float(
-                    row["Bénéfice (après 2 ans)"].replace('%', '')) / 100
+                    row["profit"].replace('%', '')) / 100
                 action = {
-                    "name": row["Actions"],
+                    "name": row["name"],
                     "cost": cost,
                     "profit": profit
                 }
@@ -61,7 +61,7 @@ def display_results(best_actions, best_profit):
 
 # Main
 def main():
-    csv_file = "liste_actions_p7.csv"
+    csv_file = "dataset1_P7.csv"
     max_budget = 500
     actions = read_data(csv_file)
     best_actions, best_profit = knapsack_optimized(actions, max_budget)
