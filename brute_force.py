@@ -8,12 +8,12 @@ def read_data(csv_file):
     with open(csv_file, mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            cost = float(row["Coût par action (en euros)"])
+            cost = float(row["price"])
             if cost > 0:  # Exclure les coûts nuls ou négatifs
                 profit = float(
-                    row["Bénéfice (après 2 ans)"].replace('%', '')) / 100
+                    row["profit"].replace('%', '')) / 100
                 action = {
-                    "name": row["Actions"],
+                    "name": row["name"],
                     "cost": cost,
                     "profit": profit
                 }
