@@ -67,8 +67,8 @@ def display_results(best_actions, best_profit, max_budget):
 
 # Main
 def main():
-    csv_file = "dataset1_P7.csv"
-    max_budget = Decimal("500")  # Utiliser Decimal pour le budget
+    csv_file = "dataset1_p7.csv"
+    max_budget = Decimal("500")
     actions = read_data(csv_file)
     best_actions, best_profit = knapsack_optimized(actions, max_budget)
     display_results(best_actions, best_profit, max_budget)
