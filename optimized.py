@@ -1,5 +1,6 @@
 import csv
 from decimal import Decimal
+import numpy as np
 
 
 # Étape 1 : Lire le fichier CSV
@@ -21,34 +22,33 @@ def read_data(csv_file):
 
 
 # Étape 2 : Résoudre avec programmation dynamique
-def knapsack_optimized(actions, max_budget):
+def knapsack_numpy(actions, max_budget):
     n = len(actions)
-    max_budget_cents = int(max_budget * 100)  # Convertir en centimes
+    max_budget_cents = int(max_budget * 100)
 
-    # Initialiser la table dynamique (dimensions : (n+1) x (max_budget+1))
-    dp = [[0 for _ in range(max_budget_cents + 1)] for _ in range(n + 1)]
+    # Table dynamique
+    dp = np.zeros(max_budget_cents + 1)
+    selected_actions = [[] for _ in range(max_budget_cents + 1)]
 
-    # Remplir la table
-    for i in range(1, n + 1):
-        for b in range(max_budget_cents + 1):
-            dp[i][b] = dp[i - 1][b]
-            action_cost_cents = int(
-                actions[i - 1]["cost"] * 100)  # En centimes
-            action_profit = actions[i - 1]["profit"] * actions[i - 1]["cost"]
-            if action_cost_cents <= b:
-                dp[i][b] = max(dp[i][b], dp[i - 1]
-                               [b - action_cost_cents] + float(action_profit))
+    # Remplir la table dynamique
+    for action in actions:
+        action_cost_cents = int(round(float(action["cost"]) * 100))
+        action_profit = float(action["profit"]) * float(action["cost"])
+
+        # Parcourir la table de manière descendante pour éviter de réutiliser plusieurs fois la même action
+        for budget in range(max_budget_cents, action_cost_cents - 1, -1):
+            if dp[budget - action_cost_cents] + action_profit > dp[budget]:
+                dp[budget] = dp[budget - action_cost_cents] + action_profit
+                selected_actions[budget] = selected_actions[budget -
+                                                            action_cost_cents] + [action]
 
     # Reconstituer la solution optimale
-    best_actions = []
-    b = max_budget_cents
-    for i in range(n, 0, -1):
-        if dp[i][b] != dp[i - 1][b]:  # Si l'action a été incluse
-            best_actions.append(actions[i - 1])
-            b -= int(actions[i - 1]["cost"] * 100)  # En centimes
+    best_budget = max_budget_cents
+    best_actions = selected_actions[best_budget]
+    total_cost = sum(action["cost"] for action in best_actions)
+    best_profit = dp[max_budget_cents]
 
-    best_profit = dp[n][max_budget_cents]
-    return best_actions, best_profit
+    return best_actions, total_cost, best_profit
 
 
 # Étape 3 : Afficher la solution
@@ -67,10 +67,12 @@ def display_results(best_actions, best_profit, max_budget):
 
 # Main
 def main():
-    csv_file = "dataset1_p7.csv"
+    csv_file = "dataset2_p7.csv"
     max_budget = Decimal("500")
     actions = read_data(csv_file)
-    best_actions, best_profit = knapsack_optimized(actions, max_budget)
+    best_actions, total_cost, best_profit = knapsack_numpy(
+        actions, max_budget)
+
     display_results(best_actions, best_profit, max_budget)
 
 
